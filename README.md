@@ -1,5 +1,5 @@
 # SK120X_MODBUS
-This code base used pyhon 3.x to access SK120X using UART interface with Modbus protocol, where SK120X module is a 120W 6A buck-boost converter. 
+This project used python 3.x to access SK120X using UART interface with Modbus protocol, where SK120X module is a 120W 6A buck-boost converter. 
 
 <img width="791" height="789" alt="image" src="https://github.com/user-attachments/assets/3b60b65b-5408-4138-a024-555e087d84d1" />
 
