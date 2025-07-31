@@ -4,6 +4,8 @@ import array
 import tkinter as tk
 import threading
 
+sk120x_access_sem=threading.Semaphore(1)
+
 MODBUS_READ_REG = 0x3
 MODBUS_WRITE_REG_SINGLE = 0x6
 MODBUS_WRITE_REG_MULTIPLE = 0x10
@@ -142,7 +144,8 @@ def MODBUS_RTU_READ_0x3( addr, mode, offset_start, read_reg_num):
     #print("crc16_msb=%x, crc16_lsb=%x"%(crc16_msb, crc16_lsb))
 
     mylist = [addr,mode,(offset_start&0xff00)>>8,(offset_start&0x00ff),  (read_reg_num&0xff00)>>8,(read_reg_num&0x00ff), crc16_msb, crc16_lsb]
-
+    
+    sk120x_access_sem.acquire()
     try:
         ser.open()
     except Exception as ex:
@@ -183,7 +186,7 @@ def MODBUS_RTU_READ_0x3( addr, mode, offset_start, read_reg_num):
                     SK120X_Reg_Dict[offset_start+i]["REG_VALUE"] = REG_VALUE[i]
             else:
                 print("response CRC check NG!")
-            time.sleep(0.3)
+            time.sleep(0.1)
 
             ser.close()
         except Exception as e1:
@@ -191,7 +194,8 @@ def MODBUS_RTU_READ_0x3( addr, mode, offset_start, read_reg_num):
 
     else:
         print ("open serial port error")
-
+    
+    sk120x_access_sem.release()
     return REG_VALUE
 
 def MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale):
@@ -205,7 +209,7 @@ def MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale):
 
     mylist = [addr,mode,(offset_start&0xff00)>>8,(offset_start&0x00ff),  (write_reg_vale&0xff00)>>8,(write_reg_vale&0x00ff), crc16_msb, crc16_lsb]
 
-
+    sk120x_access_sem.acquire()
     try:
         ser.open()
     except Exception as ex:
@@ -253,6 +257,7 @@ def MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale):
 
     else:
         print ("open serial port error")
+    sk120x_access_sem.release()
     return REG_VALUE
 
 def wait_read():
@@ -342,10 +347,63 @@ def update_sk120x_status_IVSetOut_job(stop_flag):
         VOUT.set("%d.%02dV"%( SK120X_Reg_Dict[SK120X_REG_VOUT ]["REG_VALUE"]/100,  SK120X_Reg_Dict[SK120X_REG_VOUT ]["REG_VALUE"]%100 ))
         IOUT.set("%d.%03dA"%( SK120X_Reg_Dict[SK120X_REG_IOUT ]["REG_VALUE"]/1000, SK120X_Reg_Dict[SK120X_REG_IOUT ]["REG_VALUE"]%1000))
         WOUT.set("%d.%02d0W"%(SK120X_Reg_Dict[SK120X_REG_POWER]["REG_VALUE"]/100,  SK120X_Reg_Dict[SK120X_REG_POWER]["REG_VALUE"]%100 ))
+
         time.sleep(0.5)
         #if (stop_flag):
         #   break;
 
+def sk120x_ctrl_VSetAdd():
+    SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] + 10
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_V_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+
+def sk120x_ctrl_VSetSub():
+    SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] - 10
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_V_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+def sk120x_ctrl_ISetAdd():
+    SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] + 10
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_I_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+
+def sk120x_ctrl_ISetSub():
+    SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] - 10
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_I_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+
+def sk120x_ctrl_OnOff():
+    SK120X_Reg_Dict[SK120X_REG_ONOFF]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_ONOFF]["REG_VALUE"] ^1
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_ONOFF]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_ONOFF]["REG_VALUE"]       
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
 
 
 if __name__ == '__main__':
@@ -396,6 +454,7 @@ if __name__ == '__main__':
     sk120x_ctrl_set_ONOFF()
 
 
+    
     # 建立一個子執行緒
     stop_flag = False
     t = threading.Thread(target = update_sk120x_status_IVSetOut_job, args = (lambda : stop_flag, ))
@@ -404,7 +463,7 @@ if __name__ == '__main__':
     t.start()
 
     win = tk.Tk()
-    win.geometry('320x100')
+    win.geometry('340x140')
     win.title("SK120X")
     VSET = tk.IntVar()
     ISET = tk.IntVar()
@@ -442,6 +501,42 @@ if __name__ == '__main__':
     labelIOutValue.grid(column=6, row=1, sticky="E", padx=20)
     labelWOutValue = tk.Label(win, textvariable=WOUT,background = "#f0f",font=("Arial", 12, "bold"))
     labelWOutValue.grid(column=6, row=2, sticky="E", padx=20)
+
+    # Button 設定 command 參數
+    btnVAdd = tk.Button(win,
+                    text='V+',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_VSetAdd
+                  )
+    btnVAdd.grid(column=1, row=4, sticky="E")
+    btnVSub = tk.Button(win,
+                    text='V-',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_VSetSub
+                  )
+    btnVSub.grid(column=2, row=4, sticky="W")
+
+    btnVAdd = tk.Button(win,
+                    text='I+',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_ISetAdd
+                  )
+    btnVAdd.grid(column=3, row=4, sticky="E")
+    btnVSub = tk.Button(win,
+                    text='I-',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_ISetSub
+                  )
+    btnVSub.grid(column=4, row=4, sticky="W")
+
+
+    btnONOFF = tk.Button(win,
+                    text='ONOFF',
+                    font=('Arial',16,'bold'),
+                    background = "#ff0",
+                    command=sk120x_ctrl_OnOff
+                  )
+    btnONOFF.grid(column=5, row=4, columnspan=2)
 
     win.mainloop()
 
