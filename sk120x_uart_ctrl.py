@@ -393,6 +393,48 @@ def sk120x_ctrl_ISetSub():
     write_reg_vale = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"]       #xx.xxV
 
     MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+def sk120x_ctrl_VSetAdd2():
+    SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] + 100
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_V_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+
+def sk120x_ctrl_VSetSub2():
+    SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"] - 100
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_V_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_V_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+def sk120x_ctrl_ISetAdd2():
+    SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] + 100
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_I_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
+
+def sk120x_ctrl_ISetSub2():
+    SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"] - 100
+
+    addr = SK120X_DEFAULT_DEVICE_ADDR
+    mode = MODBUS_WRITE_REG_SINGLE
+    offset_start = SK120X_Reg_Dict[SK120X_REG_I_SET]["reg_offset"]
+    write_reg_vale = SK120X_Reg_Dict[SK120X_REG_I_SET]["REG_VALUE"]       #xx.xxV
+
+    MODBUS_RTU_WRITE_0x6( addr, mode, offset_start, write_reg_vale)
+
 
 
 def sk120x_ctrl_OnOff():
@@ -449,9 +491,9 @@ if __name__ == '__main__':
     ser.dsrdtr = False     #disable hardware (DSR/DTR) flow control
 
     sk120x_ctrl_scan_status()
-    sk120x_ctrl_set_V()
-    sk120x_ctrl_set_A()
-    sk120x_ctrl_set_ONOFF()
+    #sk120x_ctrl_set_V()
+    #sk120x_ctrl_set_A()
+    #sk120x_ctrl_set_ONOFF()
 
 
     
@@ -463,7 +505,7 @@ if __name__ == '__main__':
     t.start()
 
     win = tk.Tk()
-    win.geometry('340x140')
+    win.geometry('360x160')
     win.title("SK120X")
     VSET = tk.IntVar()
     ISET = tk.IntVar()
@@ -478,29 +520,29 @@ if __name__ == '__main__':
     #rdioTwo.grid(column=0, row=1, sticky="W")
     #rdioThree.grid(column=0, row=2, sticky="W")
     lableVSetTitle = tk.Label(win,text='V_SET',background = "#8f8",font=("Arial", 12, "bold"))
-    lableVSetTitle.grid(column=1, row=0, columnspan=2, sticky="W")
+    lableVSetTitle.grid(column=1, row=0, columnspan=2, sticky="E")
     lableISetTitle = tk.Label(win,text='I_SET',background = "#fc8",font=("Arial", 12, "bold"))
-    lableISetTitle.grid(column=1, row=1, columnspan=2, sticky="W")
+    lableISetTitle.grid(column=1, row=1, columnspan=2, sticky="E")
     
     labelVSetValue = tk.Label(win, textvariable=VSET,background = "#8f8",font=("Arial", 12, "bold"))
-    labelVSetValue.grid(column=3, row=0, sticky="E", padx=20)
+    labelVSetValue.grid(column=3, row=0, sticky="W", padx=20)
     labelISetValue = tk.Label(win, textvariable=ISET,background = "#fc8",font=("Arial", 12, "bold"))
-    labelISetValue.grid(column=3, row=1, sticky="E", padx=20)
+    labelISetValue.grid(column=3, row=1, sticky="W", padx=20)
 
 
     lableVOutTitle = tk.Label(win,text='V_OUT',background = "#8f0",font=("Arial", 12, "bold"))
-    lableVOutTitle.grid(column=4, row=0, columnspan=2, sticky="W")
+    lableVOutTitle.grid(column=4, row=0, columnspan=2, sticky="E")
     lableIOutTitle = tk.Label(win,text='I_OUT',background = "#fc0",font=("Arial", 12, "bold"))
-    lableIOutTitle.grid(column=4, row=1, columnspan=2, sticky="W")
+    lableIOutTitle.grid(column=4, row=1, columnspan=2, sticky="E")
     lableWOutTitle = tk.Label(win,text='W_OUT',background = "#f0f",font=("Arial", 12, "bold"))
-    lableWOutTitle.grid(column=4, row=2, columnspan=2, sticky="W")
+    lableWOutTitle.grid(column=4, row=2, columnspan=2, sticky="E")
     
     labelVOutValue = tk.Label(win, textvariable=VOUT,background = "#8f0",font=("Arial", 12, "bold"))
-    labelVOutValue.grid(column=6, row=0, sticky="E", padx=20)
+    labelVOutValue.grid(column=6, row=0, sticky="W", padx=20)
     labelIOutValue = tk.Label(win, textvariable=IOUT,background = "#fc0",font=("Arial", 12, "bold"))
-    labelIOutValue.grid(column=6, row=1, sticky="E", padx=20)
+    labelIOutValue.grid(column=6, row=1, sticky="W", padx=20)
     labelWOutValue = tk.Label(win, textvariable=WOUT,background = "#f0f",font=("Arial", 12, "bold"))
-    labelWOutValue.grid(column=6, row=2, sticky="E", padx=20)
+    labelWOutValue.grid(column=6, row=2, sticky="W", padx=20)
 
     # Button 設定 command 參數
     btnVAdd = tk.Button(win,
@@ -537,6 +579,33 @@ if __name__ == '__main__':
                     command=sk120x_ctrl_OnOff
                   )
     btnONOFF.grid(column=5, row=4, columnspan=2)
+    
+    
+    btnVAdd = tk.Button(win,
+                    text='V++',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_VSetAdd2
+                  )
+    btnVAdd.grid(column=1, row=5, sticky="E")
+    btnVSub = tk.Button(win,
+                    text='V--',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_VSetSub2
+                  )
+    btnVSub.grid(column=2, row=5, sticky="W")
+
+    btnVAdd = tk.Button(win,
+                    text='I++',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_ISetAdd2
+                  )
+    btnVAdd.grid(column=3, row=5, sticky="E")
+    btnVSub = tk.Button(win,
+                    text='I--',
+                    font=('Arial',16,'bold'),
+                    command=sk120x_ctrl_ISetSub2
+                  )
+    btnVSub.grid(column=4, row=5, sticky="W")
 
     win.mainloop()
 
